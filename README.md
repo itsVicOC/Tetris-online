@@ -50,7 +50,7 @@ cp .env.example .env.local
 | 变量 | 用途 | 是否可公开 |
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` | Supabase 项目 URL | 可以，构建后会进入浏览器 |
-| `VITE_SUPABASE_ANON_KEY` | 浏览器读取排行榜、调用 Edge Function 的公开 key | 可以，构建后会进入浏览器 |
+| `VITE_SUPABASE_ANON_KEY` | 浏览器读取排行榜、调用 Edge Function 的公开 key；新项目优先填写 `sb_publishable_...` | 可以，构建后会进入浏览器 |
 | `SCORE_TOKEN_SECRET` | Edge Function 签发成绩令牌的 HMAC 密钥 | **必须保密，仅配置在 Supabase Function secrets** |
 | `SUPABASE_SERVICE_ROLE_KEY` | Edge Function 写入 `scores` 表 | **必须保密，仅由 Supabase 运行环境提供** |
 
@@ -86,7 +86,7 @@ npx supabase functions deploy submit-score
 - Repository variable：`VITE_SUPABASE_URL`
 - Repository secret：`VITE_SUPABASE_ANON_KEY`
 
-anon key 会被编译进浏览器，使用 secret 只是为了避免在仓库设置页面公开显示，并不改变其公开属性。首次发布前，请在 Settings → Pages 中选择 GitHub Actions。部署完成后应检查项目页、排行榜读取和无 Supabase 配置时的本地回退。
+publishable/anon key 会被编译进浏览器，使用 secret 只是为了避免在仓库设置页面公开显示，并不改变其公开属性。首次发布前，请在 Settings → Pages 中选择 GitHub Actions。部署完成后应检查项目页、排行榜读取和无 Supabase 配置时的本地回退。
 
 ## 操作
 
@@ -118,7 +118,7 @@ anon key 会被编译进浏览器，使用 secret 只是为了避免在仓库设
 
 ## 故障排查
 
-- **排行榜不可用**：检查 URL 是否包含 `https://`、anon key 是否正确、migration 和 Function 是否部署到同一项目，并查看 Edge Function 日志。
+- **排行榜不可用**：检查 URL 是否包含 `https://`、publishable key 是否正确、migration 和 Function 是否部署到同一项目，并查看 Edge Function 日志。启用新式 API key 的项目不要继续使用 legacy anon JWT。
 - **开始游戏长时间连接中**：排行榜请求会在约 3.5 秒后超时并自动回退本地模式；持续出现时请检查 Edge Function 状态。
 - **成绩校验失败**：确认浏览器时间没有明显错误，成绩是在同一局游戏结束后提交，且没有重复提交同一个游戏 ID。
 - **GitHub Pages 空白页**：确认工作流使用了 `dist/` artifact，并检查 Actions 构建日志；Vite 已配置相对资源路径。
